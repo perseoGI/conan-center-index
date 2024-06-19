@@ -1,7 +1,7 @@
 from conan import ConanFile
 from conan.tools.build import cross_building
-from conan.tools.cmake import CMake, CMakeToolchain
-from conan.tools.files import apply_conandata_patches, copy, download, get, patch, rm
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.files import apply_conandata_patches, copy, download, export_conandata_patches, get, patch, rm
 import os
 
 required_conan_version = ">=1.54.0"
@@ -29,15 +29,20 @@ class ZxcvbnConan(ConanFile):
             self.tool_requires(f"{self.name}/{self.version}")
 
     def export_sources(self):
-        copy(self, f"{self.version}-*.patch", dst=os.path.join(self.export_sources_folder, "patches"), src=os.path.join(self.recipe_folder, "patches"))
+        export_conandata_patches(self)
 
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
+            del self.options.shared
 
     def configure(self):
-        if self.options.shared:
+        if self.options.get_safe("shared"):
             self.options.rm_safe("fPIC")
+
+    def layout(self):
+        # src_folder must use the same source folder name the project
+        cmake_layout(self, src_folder="src")
 
     def source(self):
         sources = self.conan_data["sources"][self.version]
@@ -72,7 +77,7 @@ class ZxcvbnConan(ConanFile):
         self._patch_sources()
         cmake = CMake(self)
         cmake.configure()
-        cmake.build(target="zxcvbn-shared" if self.options.shared else "zxcvbn-static")
+        cmake.build(target="zxcvbn-shared" if self.options.get_safe("shared") else "zxcvbn-static")
 
     def package(self):
         copy(self, "LICENSE.txt", self.source_folder, os.path.join(self.package_folder, "licenses"))
