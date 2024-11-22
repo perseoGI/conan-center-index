@@ -91,6 +91,9 @@ class MariadbConnectorCppRecipe (ConanFile):
 
         tc.generate()
 
+    def build_id(self):
+        self.info.options.shared = "both"
+
     def build(self):
         apply_conandata_patches(self)
         cmake = CMake(self)
@@ -108,6 +111,14 @@ class MariadbConnectorCppRecipe (ConanFile):
         rm(self, "*.pdb", os.path.join(self.package_folder, "bin"))
 
         fix_apple_shared_install_name(self)
+
+        if self.options.shared:
+            for pattern in ["*.a", ".lib"]:
+                rm(self, pattern, os.path.join(self.package_folder, "lib"))
+        else:
+            for pattern in ["*.dylib", ".so", ".dll"]:
+                rm(self, pattern, os.path.join(self.package_folder, "lib"))
+                rm(self, pattern, os.path.join(self.package_folder, "bin"))
 
     def package_info(self):
         self.cpp_info.set_property("cmake_find_mode", "both")
