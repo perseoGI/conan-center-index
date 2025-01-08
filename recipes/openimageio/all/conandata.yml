@@ -1,7 +1,4 @@
 sources:
-  "2.4.7.1":
-    url: "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v2.4.7.1.tar.gz"
-    sha256: "a3dc6fdb3693eb5f1e22191e41c05800a4944f3c76daffe90bd203f956180126"
   "2.4.17.0":
     url: "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v2.4.17.0.tar.gz"
     sha256: "7fe81d8e5bce30cc4a212f020ac3cc4344e6b7c1c0842475e3a048515099c65c"
@@ -21,13 +18,6 @@ sources:
     url: "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v2.5.18.0.tar.gz"
     sha256: "f57481435cec18633d3eba9b2e8c483fc1df6f0a01c5c9f98cbae6d1c52928e5"
 patches:
-  "2.4.7.1":
-    - patch_file: "patches/2.4.7.1-cmake-targets.patch"
-      patch_description: "Ensure project builds correctly with Conan (don't pick up disabled dependencies from the system, fix different spelling of libraries)"
-      patch_type: "conan"
-    - patch_file: "patches/2.4.7.1-fix-msvc2017.patch"
-      patch_description: "Fix compile error with MSVC 2017"
-      patch_type: "official"
   "2.4.17.0":
     - patch_file: "patches/2.4.17.0-cmake-targets.patch"
       patch_description: "Ensure project builds correctly with Conan (don't pick up disabled dependencies from the system, fix different spelling of libraries)"

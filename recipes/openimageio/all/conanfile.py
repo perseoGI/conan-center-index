@@ -7,7 +7,7 @@ from conan.tools.scm import Version
 from conan.errors import ConanInvalidConfiguration
 import os
 
-required_conan_version = ">=1.53.0"
+required_conan_version = ">=2.0.9"
 
 
 class OpenImageIOConan(ConanFile):
@@ -23,6 +23,7 @@ class OpenImageIOConan(ConanFile):
     homepage = "http://www.openimageio.org/"
     url = "https://github.com/conan-io/conan-center-index"
 
+    package_type = "library"
     settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
@@ -60,21 +61,14 @@ class OpenImageIOConan(ConanFile):
         "with_libheif": True,
         "with_raw": False,  # libraw is available under CDDL-1.0 or LGPL-2.1, for this reason it is disabled by default
         "with_openjpeg": True,
-        "with_openvdb": False,  # FIXME: broken on M1
+        "with_openvdb": True,
         "with_ptex": True,
         "with_libwebp": True,
     }
+    implements = ["auto_shared_fpic"]
 
     def export_sources(self):
         export_conandata_patches(self)
-
-    def config_options(self):
-        if self.settings.os == "Windows":
-            del self.options.fPIC
-
-    def configure(self):
-        if self.options.shared:
-            self.options.rm_safe("fPIC")
 
     def requirements(self):
         # Required libraries
@@ -118,11 +112,11 @@ class OpenImageIOConan(ConanFile):
         if self.options.with_libheif:
             self.requires("libheif/1.16.2")
         if self.options.with_raw:
-            self.requires("libraw/0.21.2")
+            self.requires("libraw/0.21.3")
         if self.options.with_openjpeg:
             self.requires("openjpeg/2.5.2")
         if self.options.with_openvdb:
-            self.requires("openvdb/8.0.1")
+            self.requires("openvdb/11.0.0")
         if self.options.with_ptex:
             self.requires("ptex/2.4.2")
         if self.options.with_libwebp:
@@ -131,12 +125,16 @@ class OpenImageIOConan(ConanFile):
         # TODO: Nuke dependency
 
     def validate(self):
-        if self.settings.compiler.cppstd:
-            check_min_cppstd(self, 14)
+        check_min_cppstd(self, 14)
         if is_msvc(self) and is_msvc_static_runtime(self) and self.options.shared:
             raise ConanInvalidConfiguration(
                 "Building shared library with static runtime is not supported!"
             )
+        if self.options.with_raw and not self.dependencies["libraw"].options.get_safe("build_thread_safe", False):
+            raise ConanInvalidConfiguration(f"{self.ref} with libraw requires libraw/*:build_thread_safe=True")
+
+        if self.options.with_opencv and self.options.with_ffmpeg != self.dependencies["opencv"].options.get_safe("with_ffmpeg", True):
+            raise ConanInvalidConfiguration(f"{self.ref} with opencv requires with_ffmpeg to be the same as opencv")
 
     def layout(self):
         cmake_layout(self, src_folder="src")
@@ -159,41 +157,54 @@ class OpenImageIOConan(ConanFile):
         tc.variables["USE_PYTHON"] = False
         tc.variables["USE_EXTERNAL_PUGIXML"] = True
         tc.variables["BUILD_MISSING_FMT"] = False
-
-        # Conan is normally not used for testing, so fixing this option to not build the tests
         tc.variables["BUILD_TESTING"] = False
-
-        # OIIO CMake files are patched to check USE_* flags to require or not use dependencies
-        tc.variables["USE_JPEGTURBO"] = (
-            self.options.with_libjpeg == "libjpeg-turbo"
-        )
-        tc.variables[
-            "USE_JPEG"
-        ] = True  # Needed for jpeg.imageio plugin, libjpeg/libjpeg-turbo selection still works
-        tc.variables["USE_HDF5"] = self.options.with_hdf5
-        tc.variables["USE_OPENCOLORIO"] = self.options.with_opencolorio
-        tc.variables["USE_OPENCV"] = self.options.with_opencv
-        tc.variables["USE_TBB"] = self.options.with_tbb
-        tc.variables["USE_DCMTK"] = self.options.with_dicom
-        tc.variables["USE_FFMPEG"] = self.options.with_ffmpeg
-        tc.variables["USE_FIELD3D"] = False
-        tc.variables["USE_GIF"] = self.options.with_giflib
-        tc.variables["USE_LIBHEIF"] = self.options.with_libheif
-        tc.variables["USE_LIBRAW"] = self.options.with_raw
-        tc.variables["USE_OPENVDB"] = self.options.with_openvdb
-        tc.variables["USE_PTEX"] = self.options.with_ptex
         tc.variables["USE_R3DSDK"] = False
         tc.variables["USE_NUKE"] = False
         tc.variables["USE_OPENGL"] = False
         tc.variables["USE_QT"] = False
-        tc.variables["USE_LIBPNG"] = self.options.with_libpng
-        tc.variables["USE_FREETYPE"] = self.options.with_freetype
-        tc.variables["USE_LIBWEBP"] = self.options.with_libwebp
-        tc.variables["USE_OPENJPEG"] = self.options.with_openjpeg
+        tc.variables["INTERNALIZE_FMT"] = False
+        tc.cache_variables["CMAKE_REQUIRE_FIND_PACKAGE_fmt"] = True
+        tc.cache_variables["ROBINMAP_FOUND"] = True
+        tc.cache_variables["LIBRAW_FOUND"] = self.options.with_raw
+
+        options_target_map = {"with_libpng": "PNG", "with_freetype": "Freetype", "with_opencolorio": "OpenColorIO", "with_opencv": "OpenCV",
+            "with_tbb": "TBB", "with_dicom": "DCMTK", "with_ffmpeg": "FFmpeg", "with_giflib": "GIF", "with_libheif": "Libheif",
+            "with_raw": "LibRaw", "with_openjpeg": "OpenJPEG", "with_openvdb": "OpenVDB", "with_ptex": "Ptex", "with_libwebp": "WebP"}
+        for option, cmake_var in options_target_map.items():
+            if getattr(self.options, option):
+                if cmake_var not in ["OpenJPEG", "WebP", "FFmpeg"]: # Already required by transitives
+                    tc.cache_variables[f"CMAKE_REQUIRE_FIND_PACKAGE_{cmake_var}"] = True
+            else:
+                tc.cache_variables[f"CMAKE_DISABLE_FIND_PACKAGE_{cmake_var}"] = True
+
+        if self.options.with_libjpeg == "libjpeg":
+            tc.cache_variables[f"CMAKE_DISABLE_FIND_PACKAGE_libjpeg-turbo"] = True
+        else:
+            tc.cache_variables[f"CMAKE_REQUIRE_FIND_PACKAGE_libjpeg-turbo"] = True
 
         tc.generate()
-        cd = CMakeDeps(self)
-        cd.generate()
+        deps = CMakeDeps(self)
+        deps.set_property("ffmpeg", "cmake_file_name", "FFmpeg")  # ffmpeg -> FFmpeg
+        deps.set_property("ffmpeg", "cmake_additional_variables_prefixes", ["FFMPEG"])
+        # TODO do not disable libheif on macos
+        deps.set_property("libheif", "cmake_file_name", "Libheif")  # libheif -> Libheif
+        deps.set_property("libheif", "cmake_additional_variables_prefixes", ["LIBHEIF"])
+        deps.set_property("libraw", "cmake_file_name", "LibRaw")    # libraw -> LibRaw
+        deps.set_property("libraw", "cmake_additional_variables_prefixes", ["LibRaw_r"])
+
+        deps.set_property("dcmtk", "cmake_target_name", "DCMTK::DCMTK")    # Create a global target for DCMTK
+        deps.set_property("ptex", "cmake_file_name", "Ptex")  # ptex -> Ptex
+
+        deps.set_property("tsl-robin-map", "cmake_file_name", "Robinmap")
+        deps.set_property("tsl-robin-map", "cmake_additional_variables_prefixes", ["ROBINMAP"])
+        deps.set_property("fmt", "cmake_additional_variables_prefixes", ["FMT"])
+        deps.set_property("fmt", "cmake_target_name", "fmt::fmt-header-only")
+        deps.set_property("openvdb", "cmake_additional_variables_prefixes", ["OPENVDB"])
+
+        if self.options.with_libjpeg == "libjpeg-turbo":
+            deps.set_property("libjpeg-turbo", "cmake_target_aliases", ["JPEG::JPEG"])
+
+        deps.generate()
 
     def build(self):
         apply_conandata_patches(self)
@@ -226,9 +237,6 @@ class OpenImageIOConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "OpenImageIO")
         self.cpp_info.set_property("pkg_config_name", "OpenImageIO")
-
-        self.cpp_info.names["cmake_find_package"] = "OpenImageIO"
-        self.cpp_info.names["cmake_find_package_multi"] = "OpenImageIO"
 
         # OpenImageIO::OpenImageIO_Util
         open_image_io_util = self._add_component("OpenImageIO_Util")
