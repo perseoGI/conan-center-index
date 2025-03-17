@@ -78,6 +78,7 @@ class EasyhttpcppConan(ConanFile):
         if self.settings.os == "Windows" and self.options.shared:
             tc.preprocessor_definitions["EASYHTTPCPP_DLL"] = "1"
             tc.preprocessor_definitions["EASYHTTPCPP_API_EXPORTS"] = "1"
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         deps = CMakeDeps(self)
         deps.generate()

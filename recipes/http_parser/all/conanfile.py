@@ -45,7 +45,8 @@ class HttpParserConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["HTTP_PARSER_SRC_DIR"] = self.source_folder.replace("\\", "/")
+        tc.cache_variables["HTTP_PARSER_SRC_DIR"] = self.source_folder.replace("\\", "/")
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
     def build(self):

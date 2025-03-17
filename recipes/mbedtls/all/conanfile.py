@@ -85,8 +85,7 @@ class MBedTLSConan(ConanFile):
         tc.variables["MBEDTLS_FATAL_WARNINGS"] = False
         tc.variables["ENABLE_TESTING"] = False
         if Version(self.version) < "3.0.0":
-            # relocatable shared libs on macOS
-            tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0042"] = "NEW"
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         if is_msvc(self) and "2.16.12" <= Version(self.version) <= "3.6.0":
             tc.preprocessor_definitions["MBEDTLS_PLATFORM_SNPRINTF_MACRO"] = "snprintf"
         if self.options.enable_threading:

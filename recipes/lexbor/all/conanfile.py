@@ -1,8 +1,9 @@
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.microsoft import check_min_vs, is_msvc_static_runtime, is_msvc
-from conan.tools.files import get, copy, rm
-from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.microsoft import is_msvc
+from conan.tools.files import get, copy
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.scm import Version
 import os
 
 required_conan_version = ">=1.53.0"
@@ -62,6 +63,8 @@ class LexborConan(ConanFile):
         tc.variables["LEXBOR_TESTS_CPP"] = False
         tc.variables["LEXBOR_BUILD_SEPARATELY"] = self.options.build_separately
         tc.variables["LEXBOR_INSTALL_HEADERS"] = True
+        if Version(self.version) < "2.3.0":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
     def build(self):

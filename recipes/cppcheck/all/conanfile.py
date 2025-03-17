@@ -48,6 +48,8 @@ class CppcheckConan(ConanFile):
         if Version(self.version) >= "2.11.0":
             tc.variables["DISABLE_DMAKE"] = True
         tc.variables["FILESDIR"] = "bin"
+        if Version(self.version) < "2.14.0":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
         deps = CMakeDeps(self)

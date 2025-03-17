@@ -54,7 +54,7 @@ class CryptoPPConan(ConanFile):
         if is_apple_os(self) and cross_building(self) and Version(self.version) <= "8.6.0":
             # See https://github.com/abdes/cryptopp-cmake/pull/38
             raise ConanInvalidConfiguration("cryptopp 8.6.0 and lower do not support cross-building on Apple platforms")
-    
+
     def validate(self):
         if self.options.shared and Version(self.version) >= "8.7.0":
             raise ConanInvalidConfiguration("cryptopp 8.7.0 and higher do not support shared builds")

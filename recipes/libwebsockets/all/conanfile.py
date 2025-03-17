@@ -422,6 +422,7 @@ class LibwebsocketsConan(ConanFile):
         tc.variables["LWS_WITH_SYS_SMD"] = self.settings.os != "Windows"
         tc.variables["DISABLE_WERROR"] = True
 
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         deps = CMakeDeps(self)
         deps.generate()
@@ -440,7 +441,7 @@ class LibwebsocketsConan(ConanFile):
             save(self, project_include_file, 'find_package(OpenSSL REQUIRED)\nset(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})')
 
         # Prevent locating and copying OpenSSL binaries (not needed by the recipe)
-        replace_in_file(self, 
+        replace_in_file(self,
                         os.path.join(self.source_folder, "cmake", "FindOpenSSLbins.cmake"),
                         "if(OPENSSL_FOUND)", "if(FALSE)")
 

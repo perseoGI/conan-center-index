@@ -31,7 +31,7 @@ class LASlibConan(ConanFile):
     @property
     def _min_cppstd(self):
         return 17
-    
+
     @property
     def _compilers_minimum_version(self):
         return {
@@ -56,6 +56,7 @@ class LASlibConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        apply_conandata_patches(self)
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -72,9 +73,6 @@ class LASlibConan(ConanFile):
             )
 
     def build(self):
-        apply_conandata_patches(self)
-        save(self, os.path.join(self.source_folder, "CMakeLists.txt"), "add_subdirectory(LASlib/src)")
-        save(self, os.path.join(self.source_folder, "LASlib", "example", "CMakeLists.txt"), "")
         cmake = CMake(self)
         cmake.configure()
         cmake.build()

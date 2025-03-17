@@ -67,6 +67,7 @@ class LibeventConan(ConanFile):
         # libevent uses static runtime (MT) for static builds by default
         if is_msvc(self):
             tc.variables["EVENT__MSVC_STATIC_RUNTIME"] = is_msvc_static_runtime(self)
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         deps = CMakeDeps(self)
         deps.generate()

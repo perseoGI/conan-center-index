@@ -46,8 +46,7 @@ class LibmodplugConan(ConanFile):
         tc = CMakeToolchain(self)
         tc.preprocessor_definitions["HAVE_STDINT_H"] = 1
         tc.preprocessor_definitions["HAVE_SINF"] = 1
-        # Relocatable shared libs on macOS
-        tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0042"] = "NEW"
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
     def build(self):

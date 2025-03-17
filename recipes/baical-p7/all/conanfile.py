@@ -51,6 +51,7 @@ class BaicalP7Conan(ConanFile):
         tc.variables["P7_TESTS_BUILD"] = False
         tc.cache_variables["P7_BUILD_SHARED"] = self.options.shared
         tc.variables["P7_EXAMPLES_BUILD"] = False
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
     def build(self):

@@ -177,6 +177,8 @@ class DlibConan(ConanFile):
                 tc.variables["USE_SSE4_INSTRUCTIONS"] = self.options.with_sse4
             if self.options.with_avx != "auto":
                 tc.variables["USE_AVX_INSTRUCTIONS"] = self.options.with_avx
+        if Version(self.version) < "19.24.2":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         tc = CMakeDeps(self)
         tc.generate()

@@ -106,10 +106,10 @@ class GlslangConan(ConanFile):
         tc.variables["USE_CCACHE"] = False
         tc.variables["OVERRIDE_MSVCCRT"] = False
         tc.variables["CMAKE_MACOSX_BUNDLE"] = False
-        # Generate a relocatable shared lib on Macos
-        tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0042"] = "NEW"
         # glslang builds intermediate static libs, but Conan does not set -fPIC for shared builds
         tc.variables["CMAKE_POSITION_INDEPENDENT_CODE"] = self.options.get_safe("fPIC", True)
+        if Version(self.version) < "1.3.224.1":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
         deps = CMakeDeps(self)

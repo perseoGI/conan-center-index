@@ -109,6 +109,8 @@ class PCREConan(ConanFile):
         # Honor BUILD_SHARED_LIBS since upstream CMakeLists overrides it as a CACHE variable.
         # Issue quite similar to https://github.com/conan-io/conan/issues/11840
         tc.cache_variables["BUILD_SHARED_LIBS"] = "ON" if self.options.shared else "OFF"
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
+        # tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0026"] = "NEW" # TODO not work
         tc.generate()
 
         deps = CMakeDeps(self)

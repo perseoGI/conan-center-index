@@ -95,6 +95,8 @@ class FreetypeConan(ConanFile):
             tc.variables["FT_WITH_BROTLI"] = self.options.with_brotli
         # Generate a relocatable shared lib on Macos
         tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0042"] = "NEW"
+        if Version(self.version) < "2.13.3":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
     def _patch_sources(self):

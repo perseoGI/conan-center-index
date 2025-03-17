@@ -190,6 +190,8 @@ class OpenblasConan(ConanFile):
             tc.cache_variables["TARGET"] = self.options.target
 
         tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0077"] = "NEW"
+        if Version(self.version) < "0.3.29":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
     def _patch_sources(self):

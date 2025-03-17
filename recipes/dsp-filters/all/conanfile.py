@@ -50,11 +50,12 @@ class DSPFiltersConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
 
     def build(self):
         apply_conandata_patches(self)
-        
+
         cmake = CMake(self)
         cmake.configure(build_script_folder=os.path.join(self.source_folder, "shared"))
         cmake.build()

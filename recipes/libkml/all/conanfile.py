@@ -51,7 +51,7 @@ class LibkmlConan(ConanFile):
     def validate(self):
         if self.options.shared and is_msvc(self) and is_msvc_static_runtime(self):
             raise ConanInvalidConfiguration(f"{self.ref} shared with Visual Studio and MT runtime is not supported")
-        
+
     def package_id(self):
         cppstd = self.info.settings.get_safe("compiler.cppstd")
         if cppstd and cppstd not in ['98', 'gnu98', '11', 'gnu11', '14', 'gnu14']:
@@ -78,8 +78,7 @@ class LibkmlConan(ConanFile):
                 tc.cache_variables["CMAKE_CXX_STANDARD"] = "14"
                 tc.cache_variables["CMAKE_CXX_EXTENSIONS"] = use_gnu_extensions
 
-        # To install relocatable shared libs on Macos
-        tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0042"] = "NEW"
+        tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         deps = CMakeDeps(self)
         deps.generate()

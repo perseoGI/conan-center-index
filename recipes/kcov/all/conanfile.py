@@ -61,6 +61,8 @@ class KcovConan(ConanFile):
     def generate(self):
         tc = CMakeToolchain(self)
         tc.variables["CMAKE_PROJECT_kcov_INCLUDE"] = "conan_deps.cmake"
+        if Version(self.version) < "43": # pylint: disable=conan-condition-evals-to-constant
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         deps = CMakeDeps(self)
         # Match Find*.cmake module names used by the project

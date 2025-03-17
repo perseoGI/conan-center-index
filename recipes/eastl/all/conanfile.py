@@ -80,7 +80,7 @@ class EastlConan(ConanFile):
             raise ConanInvalidConfiguration(
                 f"{self.ref} requires C++{self._min_cppstd}, which your compiler does not support."
             )
-        
+
         if is_msvc(self) and check_min_vs(self, "193", raise_invalid=False) and Version(self.version) < "3.21.12":
             raise ConanInvalidConfiguration(f"{self.ref} is not compatible with Visual Studio 2022, please use version >= 3.21.12")
 
@@ -92,6 +92,8 @@ class EastlConan(ConanFile):
         tc.variables["EASTL_BUILD_BENCHMARK"] = False
         tc.variables["EASTL_BUILD_TESTS"] = False
         tc.variables["CMAKE_CXX_STANDARD"] = self._min_cppstd
+        if Version(self.version) < "3.21.23":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         CMakeDeps(self).generate()
 

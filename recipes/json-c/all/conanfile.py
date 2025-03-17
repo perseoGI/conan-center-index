@@ -49,6 +49,11 @@ class JSONCConan(ConanFile):
             tc.variables["DISABLE_STATIC_FPIC"] = not self.options.get_safe("fPIC", True)
         # To install relocatable shared libs on Macos
         tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0042"] = "NEW"
+        tc.cache_variables["BUILD_TESTING"] = False
+        if Version(self.version) < "0.17":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
+        else:
+            tc.cache_variables["BUILD_APPS"] = False
         tc.generate()
 
     def build(self):

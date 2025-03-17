@@ -92,6 +92,8 @@ class IXWebSocketConan(ConanFile):
         if Version(self.version) >= "10.1.5":
             tc.variables["USE_ZLIB"] = self.options.with_zlib
         tc.variables["CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS"] = True
+        if Version(self.version) < "9.8.5":
+            tc.cache_variables["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5" # CMake 4 support
         tc.generate()
         deps = CMakeDeps(self)
         deps.generate()
