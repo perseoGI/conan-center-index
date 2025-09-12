@@ -33,7 +33,7 @@ class TreeGenConan(ConanFile):
     def build_requirements(self):
         self.tool_requires("m4/1.4.19")
         if self.settings.os == "Windows":
-            self.tool_requires("winflexbison/2.5.24")
+            self.tool_requires("winflexbison/2.5.25")
         else:
             self.tool_requires("flex/2.6.4")
             self.tool_requires("bison/3.8.2")
@@ -42,11 +42,13 @@ class TreeGenConan(ConanFile):
         check_min_cppstd(self, 17)
 
     def validate(self):
+        # A recipe that can be used both as an application (tool_requires) and as a library (requires), we do not
+        # want the check_min_cppstd to run in the validate method when the recipe is being used as an application.
         if self.context == "host":
             check_min_cppstd(self, 17)
 
     def requirements(self):
-        self.requires("fmt/11.0.2", transitive_headers=True)
+        self.requires("fmt/[>=11.0.2 <13]", transitive_headers=True)
         self.requires("range-v3/0.12.0", transitive_headers=True)
 
     def source(self):
