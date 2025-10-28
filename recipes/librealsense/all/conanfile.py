@@ -145,7 +145,7 @@ class LibrealsenseConan(ConanFile):
 
         # rsutils component
         if Version(self.version) >= "2.56.5":
-            self.cpp_info.components["rsutils"].type = "static-library"
+            # rsutils is a static "static-library"
             self.cpp_info.components["rsutils"].set_property("cmake_target_name", "realsense2::rsutils")
             self.cpp_info.components["rsutils"].libs = [f"rsutils{postfix}"]
             self.cpp_info.components["rsutils"].requires = ["nlohmann_json::nlohmann_json", "lz4::lz4"]
