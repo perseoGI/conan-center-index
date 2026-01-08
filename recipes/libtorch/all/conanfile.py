@@ -53,6 +53,10 @@ class LibtorchRecipe(ConanFile):
         return self.settings.os != "Windows"
 
     @property
+    def _has_fbgemm(self):
+        return self.settings.arch == "x86_64"
+
+    @property
     def _has_ittapi(self):
         return self.settings.arch in ("x86", "x86_64")
 
@@ -98,6 +102,8 @@ class LibtorchRecipe(ConanFile):
 
         if self._has_backtrace:
             self.requires("libbacktrace/cci.20210118")
+        if self._has_fbgemm:
+            self.requires("fbgemm/1.4.2")
         if self._has_ittapi:
             self.requires("ittapi/3.25.5")
         if self.options.with_gflags:
@@ -188,7 +194,6 @@ class LibtorchRecipe(ConanFile):
         tc.cache_variables["USE_DISTRIBUTED"] = False
         tc.cache_variables["USE_CCACHE"] = False
         tc.cache_variables["USE_CUDA"] = False
-        tc.cache_variables["USE_FBGEMM"] = False  # TODO unvendor after adding to CCI
         tc.cache_variables["USE_GLOO"] = False    # TODO unvendor after adding to CCI
         tc.cache_variables["USE_KINETO"] = False  # TODO unvendor after adding to CCI
         tc.cache_variables["USE_MAGMA"] = False   # TODO unvendor after adding to CCI
@@ -198,6 +203,7 @@ class LibtorchRecipe(ConanFile):
 
         if not self._has_backtrace:
             tc.cache_variables["CMAKE_DISABLE_FIND_PACKAGE_Backtrace"] = True
+        tc.cache_variables["USE_FBGEMM"] = self._has_fbgemm
         tc.cache_variables["USE_PYTORCH_QNNPACK"] = self._has_qnnpack
         tc.cache_variables["USE_GFLAGS"] = self.options.with_gflags
         tc.cache_variables["USE_KLEIDIAI"] = self.options.get_safe("with_kleidiai")

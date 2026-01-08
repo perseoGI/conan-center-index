@@ -139,7 +139,7 @@ index 6ab41b6..bb07522 100644
  install(DIRECTORY
    "${TORCH_SRC_DIR}/csrc"
 diff --git a/cmake/Dependencies.cmake b/cmake/Dependencies.cmake
-index ef5c2fd..6a15d1e 100644
+index ef5c2fd..c926e97 100644
 --- a/cmake/Dependencies.cmake
 +++ b/cmake/Dependencies.cmake
 @@ -299,12 +299,8 @@ endif()
@@ -208,7 +208,25 @@ index ef5c2fd..6a15d1e 100644
  endif()
  
  # ---[ Vulkan deps
-@@ -708,7 +691,7 @@ endif()
+@@ -669,7 +652,7 @@ if(BUILD_TEST OR BUILD_MOBILE_BENCHMARK OR BUILD_MOBILE_TEST)
+ endif()
+ 
+ # ---[ FBGEMM
+-if(USE_FBGEMM)
++if(0)
+   set(CAFFE2_THIRD_PARTY_ROOT "${PROJECT_SOURCE_DIR}/third_party")
+   if(NOT DEFINED FBGEMM_SOURCE_DIR)
+     set(FBGEMM_SOURCE_DIR "${CAFFE2_THIRD_PARTY_ROOT}/fbgemm" CACHE STRING "FBGEMM source directory")
+@@ -693,6 +676,8 @@ if(USE_FBGEMM)
+ endif()
+ 
+ if(USE_FBGEMM)
++  find_package(fbgemmLibrary REQUIRED CONFIG)
++  list(APPEND Caffe2_DEPENDENCY_LIBS fbgemm)
+   caffe2_update_option(USE_FBGEMM ON)
+ else()
+   caffe2_update_option(USE_FBGEMM OFF)
+@@ -708,7 +693,7 @@ endif()
  # ---[ NUMA
  if(USE_NUMA)
    if(LINUX)
@@ -217,7 +235,7 @@ index ef5c2fd..6a15d1e 100644
      if(NOT NUMA_FOUND)
        message(WARNING "Not compiling with NUMA. Suppress this warning with -DUSE_NUMA=OFF")
        caffe2_update_option(USE_NUMA OFF)
-@@ -757,9 +740,8 @@ if(NOT TARGET fp16 AND NOT USE_SYSTEM_FP16)
+@@ -757,9 +742,8 @@ if(NOT TARGET fp16 AND NOT USE_SYSTEM_FP16)
        "${FP16_SOURCE_DIR}"
        "${CONFU_DEPENDENCIES_BINARY_DIR}/FP16")
    endif()
@@ -229,7 +247,7 @@ index ef5c2fd..6a15d1e 100644
  endif()
  list(APPEND Caffe2_DEPENDENCY_LIBS fp16)
  
-@@ -781,7 +763,7 @@ endif()
+@@ -781,7 +765,7 @@ endif()
  # Due to license considerations, we will only use the MPL2 parts of Eigen.
  set(EIGEN_MPL2_ONLY 1)
  if(USE_SYSTEM_EIGEN_INSTALL)
@@ -238,7 +256,7 @@ index ef5c2fd..6a15d1e 100644
    if(EIGEN3_FOUND)
      message(STATUS "Found system Eigen at " ${EIGEN3_INCLUDE_DIR})
    else()
-@@ -1307,20 +1289,9 @@ if(CAFFE2_CMAKE_BUILDING_WITH_MAIN_REPO AND NOT INTERN_DISABLE_ONNX)
+@@ -1307,20 +1291,9 @@ if(CAFFE2_CMAKE_BUILDING_WITH_MAIN_REPO AND NOT INTERN_DISABLE_ONNX)
      endif()
      list(APPEND Caffe2_DEPENDENCY_WHOLE_LINK_LIBS onnx_library)
    else()
@@ -262,7 +280,7 @@ index ef5c2fd..6a15d1e 100644
    endif()
    # Recover the build shared libs option.
    set(BUILD_SHARED_LIBS ${TEMP_BUILD_SHARED_LIBS})
-@@ -1492,15 +1463,9 @@ if(NOT INTERN_BUILD_MOBILE)
+@@ -1492,15 +1465,9 @@ if(NOT INTERN_BUILD_MOBILE)
    endif()
  
    if(USE_KLEIDIAI)
@@ -280,7 +298,7 @@ index ef5c2fd..6a15d1e 100644
    endif()
  
    if(UNIX AND NOT APPLE)
-@@ -1514,6 +1479,7 @@ if(NOT INTERN_BUILD_MOBILE)
+@@ -1514,6 +1481,7 @@ if(NOT INTERN_BUILD_MOBILE)
    endif(UNIX AND NOT APPLE)
  
    if(UNIX)
@@ -288,7 +306,7 @@ index ef5c2fd..6a15d1e 100644
      set(CMAKE_EXTRA_INCLUDE_FILES "sys/mman.h")
      CHECK_FUNCTION_EXISTS(mmap HAVE_MMAP)
      if(HAVE_MMAP)
-@@ -1546,7 +1512,7 @@ endif()
+@@ -1546,7 +1514,7 @@ endif()
  #
  set(TEMP_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
  set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libs" FORCE)
@@ -297,7 +315,7 @@ index ef5c2fd..6a15d1e 100644
  
  # Disable compiler feature checks for `fmt`.
  #
-@@ -1555,7 +1521,6 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/fmt)
+@@ -1555,7 +1523,6 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/fmt)
  # CMAKE_CXX_FLAGS in ways that break feature checks. Since we already know
  # `fmt` is compatible with a superset of the compilers that PyTorch is, it
  # shouldn't be too bad to just disable the checks.
@@ -305,7 +323,7 @@ index ef5c2fd..6a15d1e 100644
  
  list(APPEND Caffe2_DEPENDENCY_LIBS fmt::fmt-header-only)
  set(BUILD_SHARED_LIBS ${TEMP_BUILD_SHARED_LIBS} CACHE BOOL "Build shared libs" FORCE)
-@@ -1709,16 +1674,10 @@ if(USE_KINETO)
+@@ -1709,16 +1676,10 @@ if(USE_KINETO)
  endif()
  
  # Include google/FlatBuffers
