@@ -52,7 +52,7 @@ class GlibmmConan(ConanFile):
         else:
             self.requires("glib/2.78.3", transitive_headers=True)
         if self._abi_version == "2.68":
-            self.requires("libsigcpp/3.0.7", transitive_headers=True)
+            self.requires("libsigcpp/3.6.0", transitive_headers=True)
         else:
             self.requires("libsigcpp/2.10.8", transitive_headers=True)
 

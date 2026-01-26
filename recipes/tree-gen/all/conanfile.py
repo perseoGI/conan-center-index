@@ -48,7 +48,7 @@ class TreeGenConan(ConanFile):
             self.test_requires("gtest/1.15.0")
         self.tool_requires("m4/1.4.19")
         if self.settings.os == "Windows":
-            self.tool_requires("winflexbison/2.5.24")
+            self.tool_requires("winflexbison/2.5.25")
         else:
             self.tool_requires("flex/2.6.4")
             self.tool_requires("bison/3.8.2")
@@ -66,7 +66,7 @@ class TreeGenConan(ConanFile):
         if Version(self.version) < "1.0.8":
             self.requires("fmt/10.2.1", transitive_headers=True)
         else:
-            self.requires("fmt/11.0.2", transitive_headers=True)
+            self.requires("fmt/[>=11.0.2]", transitive_headers=True)
         self.requires("range-v3/0.12.0", transitive_headers=True)
 
     def source(self):

@@ -251,7 +251,7 @@ class LLVMCoreConan(ConanFile):
         if self.options.with_z3:
             self.requires("z3/4.13.0")
         if self.options.get_safe("with_zstd"):
-            self.requires("zstd/1.5.6")
+            self.requires("zstd/[>=1.5.6 <2]")
 
     def build_requirements(self):
         self.tool_requires("ninja/[>=1.10.2 <2]")

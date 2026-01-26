@@ -66,7 +66,7 @@ class TrantorConan(ConanFile):
     def requirements(self):
         self.requires("openssl/[>=1.1 <4]")
         if self.options.with_c_ares:
-            self.requires("c-ares/1.25.0")
+            self.requires("c-ares/[>=1.25.0 <2]")
         if self.options.get_safe("with_spdlog"):
             self.requires("spdlog/1.13.0")
 

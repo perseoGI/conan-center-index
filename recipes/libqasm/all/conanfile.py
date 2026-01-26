@@ -66,7 +66,7 @@ class LibqasmConan(ConanFile):
 
     def build_requirements(self):
         self.tool_requires("tree-gen/<host_version>")
-        self.tool_requires("zulu-openjdk/21.0.1")
+        self.tool_requires("zulu-openjdk/21.0.4")
         if self.settings.arch == "wasm":
             self.tool_requires("emsdk/3.1.50")
         if self._should_build_test:
@@ -90,11 +90,11 @@ class LibqasmConan(ConanFile):
             self.requires("fmt/10.2.1", transitive_headers=True)
             self.requires("tree-gen/1.0.7", transitive_headers=True, transitive_libs=True)
         else:
-            self.requires("fmt/11.0.2", transitive_headers=True)
-            self.requires("tree-gen/1.0.8", transitive_headers=True, transitive_libs=True)
+            self.requires("fmt/[>=11.0.2]", transitive_headers=True)
+            self.requires("tree-gen/1.0.9", transitive_headers=True, transitive_libs=True)
         self.requires("range-v3/0.12.0", transitive_headers=True)
         if not self.settings.arch == "wasm":
-            self.requires("antlr4-cppruntime/4.13.1", transitive_headers=True)
+            self.requires("antlr4-cppruntime/4.13.2", transitive_headers=True)
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)

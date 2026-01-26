@@ -174,7 +174,7 @@ class GdalConan(ConanFile):
 
     def requirements(self):
         self.requires("json-c/0.17")
-        self.requires("libgeotiff/1.7.1")
+        self.requires("libgeotiff/1.7.4")
         self.requires("libtiff/[>=4.6.0 <5]")
         self.requires("proj/9.3.1")
         # Used in a public header here:
@@ -183,7 +183,7 @@ class GdalConan(ConanFile):
         if self.options.with_armadillo:
             self.requires("armadillo/12.6.4")
         if self.options.with_arrow:
-            self.requires("arrow/[>=14.0.2 <20]")
+            self.requires("arrow/[>=14.0.2 <22]")
         if self.options.with_basisu:
             self.requires("libbasisu/1.15.0")
         if self.options.with_blosc:
@@ -228,7 +228,7 @@ class GdalConan(ConanFile):
         if self.options.with_kea:
             self.requires("kealib/1.4.14")
         if self.options.with_lerc:
-            self.requires("lerc/4.0.1")
+            self.requires("lerc/4.0.4")
         if self.options.get_safe("with_libaec"):
             self.requires("libaec/1.0.6")
         if self.options.with_libarchive:

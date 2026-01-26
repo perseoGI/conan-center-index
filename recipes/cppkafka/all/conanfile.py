@@ -33,7 +33,7 @@ class CppKafkaConan(ConanFile):
         cmake_layout(self, src_folder="src")
 
     def requirements(self):
-        self.requires("boost/1.83.0", transitive_headers=True)
+        self.requires("boost/[>=1.83.0 <2]", transitive_headers=True)
         self.requires("librdkafka/[>=2.3.0 <3]", transitive_headers=True)
 
     def validate(self):

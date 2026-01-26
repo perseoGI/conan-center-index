@@ -88,11 +88,11 @@ class TensorflowLiteConan(ConanFile):
             self.requires("flatbuffers/23.5.26", transitive_headers=True)
         self.requires("gemmlowp/cci.20210928")
         self.requires("ruy/cci.20231129")
-        self.requires("cpuinfo/cci.20231129")
+        self.requires("cpuinfo/[>=cci.20231129]")
         if self.settings.arch in ("x86", "x86_64"):
             self.requires("intel-neon2sse/cci.20210225")
         if self.options.with_xnnpack:
-            self.requires("xnnpack/cci.20231026")
+            self.requires("xnnpack/[>=cci.20231026]")
         if Version(self.version) >= "2.12.0" or self.options.with_xnnpack:
             self.requires("pthreadpool/cci.20231129")
         if self.options.with_xnnpack or self.options.get_safe("with_nnapi", False):

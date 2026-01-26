@@ -65,7 +65,7 @@ class LibBasisUniversalConan(ConanFile):
 
     def requirements(self):
         if self.options.with_zstd:
-            self.requires("zstd/1.5.5")
+            self.requires("zstd/[>=1.5.5 <2]")
 
     def layout(self):
         cmake_layout(self, src_folder="src")
